@@ -97,20 +97,20 @@ np.zeros(10)
 np.ones((2, 5))
 ```
 
-**Create a vector filled with numbers from i to n**
+**Create a flat array filled with numbers from i to n**
 
 ```{code-cell} ipython3
 np.arange(1, 7)
 ```
 
-**Create a vector filled with n evenly spaced numbers**
+**Create an array filled with n evenly spaced numbers**
 
 ```{code-cell} ipython3
 n = 11
 np.linspace(0, 5, n)
 ```
 
-**Create a vector filled with U(0, 1)**
+**Create an array filled with U(0, 1)**
 
 ```{code-cell} ipython3
 np.random.rand(2, 3)
@@ -121,7 +121,7 @@ np.random.rand(2, 3)
 np.random.rand(2, 3)   # Redraw
 ```
 
-**Create a vector filled with N(0, 1)**
+**Create an array filled with N(0, 1)**
 
 ```{code-cell} ipython3
 np.random.randn(2, 2, 3)
@@ -142,7 +142,6 @@ print(f"    z = {z}")
 print(f"z + x = {z + x}")
 print(f"z - x = {z - x}")
 print(f"z * x = {z * x}")
-print(f"z / x = {z / x}")
 print(f"z**x  = {z ** x}")
 ```
 

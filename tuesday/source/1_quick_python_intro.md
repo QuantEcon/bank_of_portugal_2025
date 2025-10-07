@@ -1,16 +1,19 @@
 ---
-jupytext:
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.17.2
-kernelspec:
-  display_name: Python 3 (ipykernel)
-  language: python
-  name: python3
+jupyter:
+  jupytext:
+    default_lexer: ipython3
+    text_representation:
+      extension: .md
+      format_name: markdown
+      format_version: '1.3'
+      jupytext_version: 1.17.2
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
 ---
 
+<!-- #region -->
 # A Quick Introduction to Python
 
 **Prepared for the Bank of Portugal Computational Economics Course (Oct 2025)**
@@ -27,9 +30,9 @@ Participants who want a slower treatment can either
 
 1. slow the class down by asking lots of questions, or
 1. review the first few [QuantEcon Python programming lectures](https://python-programming.quantecon.org/intro.html) after the class
+<!-- #endregion -->
 
-+++
-
+<!-- #region -->
 ## Example Task: Plotting a White Noise Process
 
 Task: simulate and plot the white noise process $ \epsilon_0, \epsilon_1,
@@ -40,8 +43,9 @@ normal.
 ### Version 1
 
 Here are a few lines of code that perform the task we set
+<!-- #endregion -->
 
-```{code-cell} ipython3
+```python
 import numpy as np
 import matplotlib.pyplot as plt   
 
@@ -52,17 +56,17 @@ ax.plot(ϵ_values)                # Plot draws
 
 Let’s discuss some aspects of this program.
 
-+++
 
 #### Imports
 
 The first two lines import functionality from external code libraries:
 
-```{code-cell} ipython3
+```python
 import numpy as np
 import matplotlib.pyplot as plt 
 ```
 
+<!-- #region -->
 The first line imports [NumPy](https://python-programming.quantecon.org/numpy.html), a Python package for tasks like
 
 - working with arrays (vectors and matrices)  
@@ -74,12 +78,13 @@ The first line imports [NumPy](https://python-programming.quantecon.org/numpy.ht
 After `import numpy as np` we have access to these attributes via the syntax `np.attribute`.
 
 Here’s two more examples
+<!-- #endregion -->
 
-```{code-cell} ipython3
+```python
 np.sqrt(4)
 ```
 
-```{code-cell} ipython3
+```python
 np.log(4)
 ```
 
@@ -90,20 +95,19 @@ to import additional functionality.
 
 Why is that?
 
-+++
 
 #### Importing Names Directly
 
 Recall this code that we saw above
 
-```{code-cell} ipython3
+```python
 import numpy as np
 np.sqrt(4)
 ```
 
 Here’s another way to access NumPy’s square root function
 
-```{code-cell} ipython3
+```python
 from numpy import sqrt
 sqrt(4)
 ```
@@ -112,7 +116,7 @@ sqrt(4)
 
 Here’s a (less efficient) version that illustrates `for` loops and Python lists.
 
-```{code-cell} ipython3
+```python
 ts_length = 100
 ϵ_values = []       # Empty list
 
@@ -128,8 +132,7 @@ How does it work?
 
 How do you like significant whitespace??
 
-+++
-
+<!-- #region -->
 #### Lists
 
 
@@ -138,15 +141,16 @@ Consider the statement `ϵ_values = []`, which creates an empty list.
 Lists are a native Python data structure used to group a collection of objects.
 
 Here's another:
+<!-- #endregion -->
 
-```{code-cell} ipython3
+```python
 x = [10, 'foo', False]
 type(x)
 ```
 
 When adding a value to a list, we can use the syntax `list_name.append(some_value)`
 
-```{code-cell} ipython3
+```python
 x.append(2.5)
 x
 ```
@@ -159,46 +163,50 @@ Here `append()` is what’s called a **method**, which is a function "attached t
 
 Another useful list method is `pop()`
 
-```{code-cell} ipython3
+```python
 x
 ```
 
-```{code-cell} ipython3
+```python
 x.pop()
 ```
 
-```{code-cell} ipython3
+```python
 x
 ```
 
+<!-- #region -->
 How can I get a list of all methods?
 
 
 ### Indices
 
 Lists in Python are zero-based (as in C, Java or Go), so the first element is referenced by `x[0]`
+<!-- #endregion -->
 
-```{code-cell} ipython3
+```python
 x[0]   # First element of x
 ```
 
-```{code-cell} ipython3
+```python
 x[1]   # Second element of x
 ```
 
+<!-- #region -->
 Who likes zero based lists/arrays?
 
 
 To get the last element use?
+<!-- #endregion -->
 
-+++
-
+<!-- #region -->
 ### While Loops
 
 
 For the purpose of illustration, let’s modify our program to use a `while` loop instead of a `for` loop.
+<!-- #endregion -->
 
-```{code-cell} ipython3
+```python
 ts_length = 100
 ϵ_values = []
 i = 0
@@ -213,7 +221,6 @@ ax.plot(ϵ_values)
 
 How does it work?
 
-+++
 
 **Exercise**
 
@@ -230,32 +237,32 @@ You can use a Python list to store this sequence, or a NumPy array.
 
 In the first case, start with
 
-```{code-cell} ipython3
+```python
 T = 50
 b = []
 ```
 
 In the second case, you can use a statement such as
 
-```{code-cell} ipython3
+```python
 T = 50
 b = np.empty(T+1)   # Allocate memory to store all b_t
 ```
 
 and then populate `b` in a for loop.
 
-```{code-cell} ipython3
+```python
 # Put your solution here
 ```
 
-```{code-cell} ipython3
+```python
 for _ in range(20):
     print("Solution below!")
 ```
 
 Here's the list-based solution
 
-```{code-cell} ipython3
+```python
 b = []
 x = 10         # initial balance
 r = 0.025         # interest rate
@@ -273,7 +280,7 @@ plt.show()
 
 And here's the NumPy array-based solution.
 
-```{code-cell} ipython3
+```python
 b = np.empty(T+1) # an empty NumPy array, to store all b_t
 b[0] = 10         # initial balance
 for t in range(T):
@@ -299,25 +306,25 @@ were $ \{\epsilon_t\} $ is IID and standard normal.
 
 In your solution, restrict your import statements to
 
-```{code-cell} ipython3
+```python
 import numpy as np
 import matplotlib.pyplot as plt
 ```
 
 Set $ T=200 $ and $ \alpha = 0.9 $.
 
-```{code-cell} ipython3
+```python
 # Put your code here
 ```
 
-```{code-cell} ipython3
+```python
 for i in range(20):
     print("Solution below.")
 ```
 
 Here’s one solution.
 
-```{code-cell} ipython3
+```python
 α = 0.9
 T = 200
 x = np.empty(T+1)
@@ -342,16 +349,16 @@ If you can, add a legend, to help distinguish between the three time series.
 - If you call the `plot()` function multiple times before calling `show()`, all of the lines you produce will end up on the same figure.  
 - For the legend, if `var = 42`, then `f'foo{var}'` evaluates to `'foo42'`.
 
-```{code-cell} ipython3
+```python
 # Put your code here
 ```
 
-```{code-cell} ipython3
+```python
 for i in range(20):
     print("Solution below.")
 ```
 
-```{code-cell} ipython3
+```python
 α_values = [0.0, 0.8, 0.98]
 T = 200
 x = np.empty(T+1)
@@ -374,11 +381,11 @@ In Python, conditions are usually implemented with if-else syntax.
 Here’s an example, that prints -1 for each negative number in an array and 1
 for each nonnegative number
 
-```{code-cell} ipython3
+```python
 numbers = [-9, 2.3, -11, 0]
 ```
 
-```{code-cell} ipython3
+```python
 for x in numbers:
     if x < 0:
         print(-1)
@@ -399,7 +406,7 @@ $$
 
 were $ \{\epsilon_t\} $ is IID and standard normal.  Use
 
-```{code-cell} ipython3
+```python
 α = 0.9
 T = 200
 ```
@@ -409,18 +416,18 @@ to compute the absolute value.
 
 Replace this existing function with an if-else condition.
 
-```{code-cell} ipython3
+```python
 # Put your code here
 ```
 
-```{code-cell} ipython3
+```python
 for i in range(20):
     print("Solution below.")
 ```
 
 Here’s one way:
 
-```{code-cell} ipython3
+```python
 x = np.empty(T+1)
 x[0] = 0
 
@@ -437,7 +444,7 @@ ax.plot(x)
 
 Here’s another way to write the same thing:
 
-```{code-cell} ipython3
+```python
 α = 0.9
 T = 200
 x = np.empty(T+1)
@@ -459,25 +466,25 @@ For example, `1.5` is a floating point number, while `1` is an integer.
 
 Another data type is Boolean values, which can be either `True` or `False`
 
-```{code-cell} ipython3
+```python
 x = True
 x
 ```
 
 We can check the type of any object in memory using the `type()` function.
 
-```{code-cell} ipython3
+```python
 type(x)
 ```
 
 What happens in the next line of code?
 
-```{code-cell} ipython3
+```python
 y = 100 < 10
 y
 ```
 
-```{code-cell} ipython3
+```python
 type(y)
 ```
 
@@ -487,15 +494,15 @@ This is called **Boolean arithmetic** and is often useful in programming.
 
 Here are some examples
 
-```{code-cell} ipython3
+```python
 x + y
 ```
 
-```{code-cell} ipython3
+```python
 x * y
 ```
 
-```{code-cell} ipython3
+```python
 bools = [True, True, False, True]  # List of Boolean values
 sum(bools)
 ```
@@ -508,13 +515,13 @@ We have already discussed lists.
 
 A related data type is **tuples**, which are "immutable" lists
 
-```{code-cell} ipython3
+```python
 x = ('a', 'b')  # Parentheses instead of the square brackets
 x =  'a', 'b'    # Or no brackets --- the meaning is identical
 x
 ```
 
-```{code-cell} ipython3
+```python
 type(x)
 ```
 
@@ -524,7 +531,7 @@ Conversely, an object is **mutable** if it can still be altered after creation.
 
 Python lists are mutable
 
-```{code-cell} ipython3
+```python
 x = [1, 2]
 x[0] = 10
 x
@@ -532,20 +539,20 @@ x
 
 But tuples are not
 
-```{code-cell} ipython3
+```python
 x = (1, 2)
 #x[0] = 10  # Uncomment and run
 ```
 
 Tuples (and lists) can be “unpacked” as follows
 
-```{code-cell} ipython3
+```python
 integers = (10, 20, 30)
 x, y, z = integers
 x
 ```
 
-```{code-cell} ipython3
+```python
 y
 ```
 
@@ -556,12 +563,12 @@ notation.
 
 For example,
 
-```{code-cell} ipython3
+```python
 a = ["a", "b", "c", "d", "e"]
 a[1:]
 ```
 
-```{code-cell} ipython3
+```python
 a[1:3]
 ```
 
@@ -569,11 +576,11 @@ The rule is `a[m:n]` returns `n - m` elements, starting at `a[m]`.
 
 Also:
 
-```{code-cell} ipython3
+```python
 a[-2:]  # Last two elements of the list
 ```
 
-```{code-cell} ipython3
+```python
 s = 'foobar'
 s[-3:]  # Last three elements
 ```
@@ -591,7 +598,7 @@ Many Python objects are "iterable", in the sense that they can be looped over.
 
 To give an example, let’s write the file us_cities.txt, which lists US cities and their population, to the present working directory.
 
-```{code-cell} ipython3
+```python
 %%writefile us_cities.txt
 new york: 8244910
 los angeles: 3819702
@@ -608,7 +615,7 @@ Suppose that we want to make the information more readable, by capitalizing name
 
 The program below reads the data in and makes the conversion:
 
-```{code-cell} ipython3
+```python
 with open('us_cities.txt', 'r') as data_file:
     for line in data_file:
         city, population = line.split(':')         # Tuple unpacking
@@ -623,7 +630,7 @@ Python tends to favor looping without explicit indexing.
 
 For example,
 
-```{code-cell} ipython3
+```python
 x_values = [1, 2, 3]  # Some iterable x
 for x in x_values:
     print(x * x)
@@ -631,7 +638,7 @@ for x in x_values:
 
 is preferred to
 
-```{code-cell} ipython3
+```python
 for i in range(len(x_values)):
     print(x_values[i] * x_values[i])
 ```
@@ -642,7 +649,7 @@ One is `zip()`, which is used for stepping through pairs from two sequences.
 
 For example, try running the following code
 
-```{code-cell} ipython3
+```python
 countries = ('Japan', 'Korea', 'China')
 cities = ('Tokyo', 'Seoul', 'Beijing')
 
@@ -654,7 +661,7 @@ If we actually need the index from a list, one option is to use `enumerate()`.
 
 To understand what `enumerate()` does, consider the following example
 
-```{code-cell} ipython3
+```python
 letter_list = ['a', 'b', 'c']
 for index, letter in enumerate(letter_list):
     print(f"letter_list[{index}] = '{letter}'")
@@ -667,7 +674,7 @@ for index, letter in enumerate(letter_list):
 Consider the following example, where the list comprehension is on the
 right-hand side of the second line
 
-```{code-cell} ipython3
+```python
 animals = ['dog', 'cat', 'bird']
 plurals = [animal + 's' for animal in animals]
 plurals
@@ -675,56 +682,58 @@ plurals
 
 Here’s another example
 
-```{code-cell} ipython3
+```python
 range(8)
 ```
 
-```{code-cell} ipython3
+```python
 list(range(8))
 ```
 
-```{code-cell} ipython3
+```python
 doubles = [2 * x for x in range(8)]
 doubles
 ```
 
+<!-- #region -->
 ## Comparisons and Logical Operators
 
 
 ### Comparisons
 
 Comparisons are statements such as
+<!-- #endregion -->
 
-```{code-cell} ipython3
+```python
 1 < 10
 ```
 
 In Python we can chain inequalities
 
-```{code-cell} ipython3
+```python
 1 < 2 < 3
 ```
 
-```{code-cell} ipython3
+```python
 1 <= 2 <= 3
 ```
 
 When testing for equality we use `==`
 
-```{code-cell} ipython3
+```python
 x = 1    # Assignment
 x == 2   # Comparison
 ```
 
 For non numerical comparisons we can use `is`
 
-```{code-cell} ipython3
+```python
 None is None
 ```
 
 For “not equal” use `!=`
 
-```{code-cell} ipython3
+```python
 1 != 2
 ```
 
@@ -734,19 +743,19 @@ We can combine expressions using `and`, `or` and `not`.
 
 These are the standard logical connectives (conjunction, disjunction and denial)
 
-```{code-cell} ipython3
+```python
 1 < 2 and 'f' in 'foo'
 ```
 
-```{code-cell} ipython3
+```python
 1 < 2 and 'g' in 'foo'
 ```
 
-```{code-cell} ipython3
+```python
 1 < 2 or 'g' in 'foo'
 ```
 
-```{code-cell} ipython3
+```python
 not not True
 ```
 
@@ -758,7 +767,6 @@ You can find Python programming philosophy by typing `import this` at the prompt
 
 See also the Python style guide [PEP8](https://www.python.org/dev/peps/pep-0008/).
 
-+++
 
 **Exercise**
 
@@ -768,11 +776,11 @@ their inner product using `zip()`.
 3. Given `pairs = ((2, 5), (4, 2), (9, 8), (12, 10))`, count the number of pairs `(a, b)`
 such that both `a` and `b` are even.
 
-```{code-cell} ipython3
+```python
 # Put your solutions here
 ```
 
-```{code-cell} ipython3
+```python
 for i in range(20):
     print("Solutions below.")
 ```
@@ -781,7 +789,7 @@ for i in range(20):
 
 Here’s one possible solution
 
-```{code-cell} ipython3
+```python
 x_vals = [1, 2, 3]
 y_vals = [1, 1, 1]
 sum([x * y for x, y in zip(x_vals, y_vals)])
@@ -789,7 +797,7 @@ sum([x * y for x, y in zip(x_vals, y_vals)])
 
 This also works
 
-```{code-cell} ipython3
+```python
 sum(x * y for x, y in zip(x_vals, y_vals))
 ```
 
@@ -797,19 +805,19 @@ sum(x * y for x, y in zip(x_vals, y_vals))
 
 One solution is
 
-```{code-cell} ipython3
+```python
 sum([x % 2 == 0 for x in range(100)])
 ```
 
 This also works:
 
-```{code-cell} ipython3
+```python
 sum(x % 2 == 0 for x in range(100))
 ```
 
 So does this:
 
-```{code-cell} ipython3
+```python
 len([x for x in range(100) if x % 2 == 0])
 ```
 
@@ -817,7 +825,7 @@ len([x for x in range(100) if x % 2 == 0])
 
 Here’s one possibility
 
-```{code-cell} ipython3
+```python
 pairs = ((2, 5), (4, 2), (9, 8), (12, 10))
 sum([x % 2 == 0 and y % 2 == 0 for x, y in pairs])
 ```
@@ -828,18 +836,18 @@ sum([x % 2 == 0 and y % 2 == 0 for x, y in pairs])
 
 Here’s a very simple Python function
 
-```{code-cell} ipython3
+```python
 def f(x):
     return 2 * x + 1
 ```
 
 Now that we’ve defined this function, let’s *call* it and check whether it does what we expect:
 
-```{code-cell} ipython3
+```python
 f(1)   
 ```
 
-```{code-cell} ipython3
+```python
 f(10)
 ```
 
@@ -848,7 +856,7 @@ Here’s a longer function, that computes the absolute value of a given number.
 (Such a function already exists as a built-in, but let’s write our own for the
 exercise.)
 
-```{code-cell} ipython3
+```python
 def new_abs_function(x):
     if x < 0:
         abs_value = -x
@@ -859,17 +867,17 @@ def new_abs_function(x):
 
 Let’s call it to check that it works:
 
-```{code-cell} ipython3
+```python
 new_abs_function(3)
 ```
 
-```{code-cell} ipython3
+```python
 new_abs_function(-3)
 ```
 
 Note that a function can have arbitrarily many `return` statements (including zero).
 
-```{code-cell} ipython3
+```python
 def another_abs_function(x):
     if x < 0:
         return -x
@@ -878,12 +886,12 @@ def another_abs_function(x):
 
 Functions without a return statement automatically return the special Python object `None`.
 
-```{code-cell} ipython3
+```python
 def foo():
     pass
 ```
 
-```{code-cell} ipython3
+```python
 x = foo()
 print(x)
 ```
@@ -894,18 +902,18 @@ Write a function that takes a string as an argument and returns the number of ca
 
 (Hint:`'foo'.upper()` returns `'FOO'`.)
 
-```{code-cell} ipython3
+```python
 # Put your solution here
 ```
 
-```{code-cell} ipython3
+```python
 for i in range(20):
     print("Solution below.")
 ```
 
 Here’s one solution:
 
-```{code-cell} ipython3
+```python
 def count_upper_case(string):
     count = 0
     for letter in string:
@@ -918,32 +926,34 @@ count_upper_case('The Rain in Spain')
 
 Alternatively,
 
-```{code-cell} ipython3
+```python
 def count_upper_case(string):
     return sum([c.isupper() and c.isalpha() for c in string])
 
 count_upper_case('The Rain in Spain')
 ```
 
+<!-- #region -->
 ### Keyword Arguments
 
 
 The following example illustrates the syntax
+<!-- #endregion -->
 
-```{code-cell} ipython3
+```python
 def f(x, a=1, b=1):
     return a + b * x
 ```
 
 The keyword argument values we supplied in the definition of `f` become the default values
 
-```{code-cell} ipython3
+```python
 f(2)
 ```
 
 They can be modified as follows
 
-```{code-cell} ipython3
+```python
 f(2, a=4, b=5)
 ```
 
@@ -953,29 +963,29 @@ f(2, a=4, b=5)
 - Any object can be passed to a function as an argument, including other functions.  
 - A function can return any kind of object, including functions.
 
-+++
-
+<!-- #region -->
 ### One-Line Functions: `lambda`
 
 
 The `lambda` keyword is used to create simple functions on one line.
 
 For example,
+<!-- #endregion -->
 
-```{code-cell} ipython3
+```python
 def f(x):
     return x**3
 ```
 
 is equivalent to.
 
-```{code-cell} ipython3
+```python
 f = lambda x: x**3
 ```
 
 One use case is "anonymous" functions
 
-```{code-cell} ipython3
+```python
 from scipy.integrate import quad
 quad(lambda x: x**3, 0, 2)
 ```
@@ -984,7 +994,7 @@ quad(lambda x: x**3, 0, 2)
 
 Consider again the code
 
-```{code-cell} ipython3
+```python
 ts_length = 100
 ϵ_values = []   # empty list
 
@@ -998,7 +1008,7 @@ ax.plot(ϵ_values)
 
 Let's create a function that does most of the work.
 
-```{code-cell} ipython3
+```python
 def generate_data(n):
     ϵ_values = []
     for i in range(n):
@@ -1013,7 +1023,7 @@ ax.plot(data)
 
 Here's an alternative where we pass a function to a function:
 
-```{code-cell} ipython3
+```python
 def generate_data(n, generator_type):
     ϵ_values = []
     for i in range(n):
@@ -1036,18 +1046,18 @@ Without any import besides `from numpy.random import uniform`, write a function
 
 Hint: If $ U $ is uniform on $ (0, 1) $ and $ p \in (0,1) $, then the expression `U < p` evaluates to `True` with probability $ p $.
 
-```{code-cell} ipython3
+```python
 # Put your solution here
 ```
 
-```{code-cell} ipython3
+```python
 for i in range(20):
     print("Solution below.")
 ```
 
 Here's one solution:
 
-```{code-cell} ipython3
+```python
 from numpy.random import uniform
 
 def binomial_rv(n, p):
@@ -1061,6 +1071,7 @@ def binomial_rv(n, p):
 binomial_rv(10, 0.5)
 ```
 
+<!-- #region -->
 ## OOP: Objects and Methods
 
 
@@ -1097,22 +1108,23 @@ In Python, an *object* is a collection of data and instructions held in computer
 1. a unique identity  
 1. data (i.e., content, reference count)  
 1. methods
+<!-- #endregion -->
 
-+++
-
+<!-- #region -->
 #### Type
 
 
 Python provides for different types of objects, to accommodate different categories of data.
 
 For example
+<!-- #endregion -->
 
-```{code-cell} ipython3
+```python
 s = 'This is a string'
 type(s)
 ```
 
-```{code-cell} ipython3
+```python
 x = 42   # Now let's create an integer
 type(x)
 ```
@@ -1121,19 +1133,19 @@ The type of an object matters for many expressions.
 
 For example, the addition operator between two strings means concatenation
 
-```{code-cell} ipython3
+```python
 '300' + 'cc'
 ```
 
 On the other hand, between two numbers it means ordinary addition
 
-```{code-cell} ipython3
+```python
 300 + 400
 ```
 
 Consider the following expression
 
-```{code-cell} ipython3
+```python
 #'300' + 400   # uncomment and run
 ```
 
@@ -1142,38 +1154,37 @@ Here we are mixing types, and it’s unclear to Python whether the user wants to
 Python is *strongly typed* -- throws an error rather than trying to perform
 hidden type conversion.
 
-+++
-
+<!-- #region -->
 #### Identity
 
 
 In Python, each object has a unique identifier, which helps Python (and us) keep track of the object.
 
 The identity of an object can be obtained via the `id()` function
+<!-- #endregion -->
 
-```{code-cell} ipython3
+```python
 y = 2.5
 z = 2.5
 id(y)
 ```
 
-```{code-cell} ipython3
+```python
 id(z)
 ```
 
 Here `y` and `z` have the same value but they are not the same object.
 
-+++
 
 **Question** Why is the following case different??!
 
-```{code-cell} ipython3
+```python
 a = 10
 b = 10
 id(a)
 ```
 
-```{code-cell} ipython3
+```python
 id(b)
 ```
 
@@ -1184,16 +1195,16 @@ the data `42`.
 
 In fact, it contains more, as the following example shows
 
-```{code-cell} ipython3
+```python
 x = 42
 x
 ```
 
-```{code-cell} ipython3
+```python
 x.imag
 ```
 
-```{code-cell} ipython3
+```python
 x.__class__
 ```
 
@@ -1206,42 +1217,42 @@ Any name following a dot is called an *attribute* of the object to the left of t
 
 We see from this example that objects have attributes that contain auxiliary information.
 
-+++
-
+<!-- #region -->
 ### Methods
 
 
 Attributes that are *callable* (act like functions) are called *methods*.
 
 Informally, methods are functions that are bundled with objects.
+<!-- #endregion -->
 
-```{code-cell} ipython3
+```python
 x = ['foo', 'bar']
 callable(x.append)
 ```
 
-```{code-cell} ipython3
+```python
 callable(x.__doc__)
 ```
 
 Methods typically act on the data contained in the object they belong to, or combine that data with other data
 
-```{code-cell} ipython3
+```python
 x = ['a', 'b']
 x.append('c')
 x
 ```
 
-```{code-cell} ipython3
+```python
 s = 'This is a string'
 s.upper()
 ```
 
-```{code-cell} ipython3
+```python
 s.lower()
 ```
 
-```{code-cell} ipython3
+```python
 s.replace('This', 'That')
 ```
 
@@ -1249,7 +1260,7 @@ A great deal of Python functionality is organized around method calls.
 
 For example, consider the following piece of code
 
-```{code-cell} ipython3
+```python
 x = ['a', 'b']
 x[0] = 'aa'  # Item assignment using square bracket notation
 x
@@ -1260,7 +1271,7 @@ bracket assignment notation is just a convenient interface to a method call.
 
 What actually happens is that Python calls the `__setitem__` method, as follows
 
-```{code-cell} ipython3
+```python
 x = ['a', 'b']
 x.__setitem__(0, 'aa')  # Equivalent to x[0] = 'aa'
 x
@@ -1270,13 +1281,13 @@ x
 
 There’s a nice package called [rich](https://github.com/Textualize/rich) that helps us view the contents of an object.
 
-```{code-cell} ipython3
+```python
 #!pip install rich   # Uncomment if necessary
 ```
 
 For example,
 
-```{code-cell} ipython3
+```python
 from rich import inspect
 x = 10
 inspect(x)
@@ -1284,22 +1295,22 @@ inspect(x)
 
 If we want to see the methods as well, we can use
 
-```{code-cell} ipython3
+```python
 inspect(x, methods=True)
 ```
 
 In fact there are still more methods, as you can see if you execute `inspect(10, all=True)`.
 
-+++
-
+<!-- #region -->
 ## Names and Namespaces
 
 ### Variable Names in Python
 
 
 Consider the Python statement
+<!-- #endregion -->
 
-```{code-cell} ipython3
+```python
 x = 42
 ```
 
@@ -1308,7 +1319,7 @@ name `x` to the integer object `42`.
 
 There is no problem binding two or more names to the one object, regardless of what that object is
 
-```{code-cell} ipython3
+```python
 def f(string):      # Create a function called f
     print(string)   # that prints any string it's passed
 
@@ -1316,7 +1327,7 @@ g = f
 id(g) == id(f)
 ```
 
-```{code-cell} ipython3
+```python
 g('test')
 ```
 
@@ -1324,7 +1335,7 @@ What happens when the number of names bound to an object goes to zero?
 
 Here’s an example of this situation:
 
-```{code-cell} ipython3
+```python
 x = 'foo'    # the string object 'foo' is created in memory and x is bound to it 
 x = 'bar'    # x is rebound to the string object 'bar'
 ```
@@ -1335,14 +1346,14 @@ Python releases `'foo'` to be garbage collected.
 
 (The memory slot that stores that object is returned to the operating system.)
 
-+++
-
+<!-- #region -->
 ### Namespaces
 
 
 Recall from the preceding discussion that the statement
+<!-- #endregion -->
 
-```{code-cell} ipython3
+```python
 x = 42
 ```
 
@@ -1352,7 +1363,6 @@ This process of binding `x` to the correct object is implemented as a dictionary
 
 This dictionary is called a namespace.
 
-+++
 
 Python uses multiple namespaces, creating them on the fly as necessary.
 
@@ -1360,7 +1370,7 @@ For example, every time we import a module, Python creates a namespace for that 
 
 To see this in action, suppose we write a script `mathfoo.py` as follows
 
-```{code-cell} ipython3
+```python
 %%writefile mathfoo.py
 pi = 'foobar'
 x = 42
@@ -1368,23 +1378,23 @@ x = 42
 
 Let's import this "module"
 
-```{code-cell} ipython3
+```python
 import mathfoo
 ```
 
 Next let’s import the `math` module from the standard library
 
-```{code-cell} ipython3
+```python
 import math
 ```
 
 Both of these modules have an attribute called `pi`
 
-```{code-cell} ipython3
+```python
 math.pi
 ```
 
-```{code-cell} ipython3
+```python
 mathfoo.pi
 ```
 
@@ -1392,14 +1402,15 @@ These two different bindings of `pi` exist in different namespaces, each one imp
 
 If you wish, you can look at the dictionary directly, using `module_name.__dict__`.
 
-```{code-cell} ipython3
+```python
 mathfoo.__dict__.keys()  # Show all keys in the dictionary
 ```
 
-```{code-cell} ipython3
+```python
 mathfoo.__dict__['pi']
 ```
 
+<!-- #region -->
 ### Interactive Sessions
 
 
@@ -1410,8 +1421,9 @@ What about commands typed at the prompt?
 These are also regarded as being executed within a module — in this case, a module called `__main__`.
 
 To check this, we can look at the current module name via the value of `__name__`
+<!-- #endregion -->
 
-```{code-cell} ipython3
+```python
 print(__name__)
 ```
 
@@ -1420,18 +1432,18 @@ executed as part of `__main__` too.
 
 To see this, let’s create a file `mod.py` that prints its own `__name__` attribute
 
-```{code-cell} ipython3
+```python
 %%file mod.py
 print(__name__)
 ```
 
 Now let’s look at two different ways of running it in IPython
 
-```{code-cell} ipython3
+```python
 import mod  # Standard import
 ```
 
-```{code-cell} ipython3
+```python
 %run mod.py  # Run interactively
 ```
 
@@ -1445,7 +1457,7 @@ needs, and has initialized when you started up your session.
 If you prefer to see only the variables you have initialized, use the IPython
 "magic" command `%whos`
 
-```{code-cell} ipython3
+```python
 x = 2
 y = 3
 import numpy as np
@@ -1461,7 +1473,6 @@ For example, suppose that we start the interpreter and begin making assignments.
 
 We are now working in the module `__main__`, and hence the namespace for `__main__` is the global namespace.
 
-+++
 
 When we call a function, the interpreter creates a **local namespace** for that
 function, and registers the variables in that namespace.
@@ -1474,7 +1485,7 @@ While the function is executing, we can view the contents of the local namespace
 
 For example, consider
 
-```{code-cell} ipython3
+```python
 def f(x):
     a = 2
     print(locals())
@@ -1483,10 +1494,11 @@ def f(x):
 
 Now let’s call the function
 
-```{code-cell} ipython3
+```python
 f(1)
 ```
 
+<!-- #region -->
 ### The `__builtins__` Namespace
 
 
@@ -1496,28 +1508,30 @@ How does access to these names work?
 
 - These definitions are stored in a module called `__builtin__`.  
 - They have their own namespace called `__builtins__`.
+<!-- #endregion -->
 
-```{code-cell} ipython3
+```python
 # Show the first 10 names in `__builtins__`
 dir(__builtins__)[:10]
 ```
 
 We can access elements of the namespace as follows
 
-```{code-cell} ipython3
+```python
 __builtins__.max
 ```
 
 But `__builtins__` is special, because we can always access them directly as well
 
-```{code-cell} ipython3
+```python
 max
 ```
 
-```{code-cell} ipython3
+```python
 __builtins__.max == max
 ```
 
+<!-- #region -->
 ## Name Resolution
 
 Namespaces help us organize variable names.
@@ -1542,8 +1556,9 @@ If the interpreter is executing a function, then the directly accessible namespa
 
 
 Sometimes functions are defined within other functions, like so
+<!-- #endregion -->
 
-```{code-cell} ipython3
+```python
 def f():
     a = 2
     def g():
@@ -1552,6 +1567,7 @@ def f():
     g()
 ```
 
+<!-- #region -->
 Here `f` is the *enclosing function* for `g`, and each function gets its
 own namespaces.
 
@@ -1568,8 +1584,7 @@ The order in which the interpreter searches for names is
 If the name is not in any of these namespaces, the interpreter raises a `NameError`.
 
 This is called the **LEGB rule** (local, enclosing, global, builtin).
-
-+++
+<!-- #endregion -->
 
 ### Mutable Versus Immutable Parameters
 
@@ -1577,7 +1592,7 @@ This is a good time to say a little more about mutable vs immutable objects.
 
 Consider the code segment
 
-```{code-cell} ipython3
+```python
 def f(x):
     x = x + 1
     return x
@@ -1586,6 +1601,7 @@ x = 100
 print(f"f(x) = {f(x)} and x = {x}")
 ```
 
+<!-- #region -->
 Here's what happens
 
 * First `f` and `x` are registered in the global namespace.
@@ -1596,8 +1612,9 @@ Here's what happens
 None of this affects the global `x`.
 
 However, it’s a different story when we use a **mutable** data type such as a list
+<!-- #endregion -->
 
-```{code-cell} ipython3
+```python
 def f(x):
     x[0] = x[0] + 1
     return x
