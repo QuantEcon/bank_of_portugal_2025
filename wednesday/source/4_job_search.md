@@ -1,14 +1,16 @@
 ---
-jupytext:
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.17.2
-kernelspec:
-  display_name: Python 3 (ipykernel)
-  language: python
-  name: python3
+jupyter:
+  jupytext:
+    default_lexer: ipython3
+    text_representation:
+      extension: .md
+      format_name: markdown
+      format_version: '1.3'
+      jupytext_version: 1.17.2
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
 ---
 
 # Job Search
@@ -27,13 +29,13 @@ draws
 
 In addition to what's in Anaconda, this lecture will need the QE library:
 
-```{code-cell} ipython3
+```python
 !pip install quantecon  
 ```
 
 We use the following imports.
 
-```{code-cell} ipython3
+```python
 import matplotlib.pyplot as plt
 import quantecon as qe
 import numpy as np
@@ -86,13 +88,12 @@ $$
 
 We solve this model using value function iteration.
 
-+++
 
 ## Code
 
 Let's set up a `Model` class to store information needed to solve the model.
 
-```{code-cell} ipython3
+```python
 class Model(NamedTuple):
     n: int
     w_vals: np.ndarray
@@ -103,7 +104,7 @@ class Model(NamedTuple):
 
 The function below holds default values and creates a `Model` instance.
 
-```{code-cell} ipython3
+```python
 def create_js_model(
         n: int = 500,       # wage grid size
         ρ: float = 0.9,     # wage persistence
@@ -119,19 +120,19 @@ def create_js_model(
 
 Let's test it:
 
-```{code-cell} ipython3
+```python
 model = create_js_model(β=0.98)
 ```
 
-```{code-cell} ipython3
+```python
 model.c
 ```
 
-```{code-cell} ipython3
+```python
 model.β
 ```
 
-```{code-cell} ipython3
+```python
 model.w_vals.mean()
 ```
 
@@ -144,7 +145,7 @@ $$
     \right\}
 $$
 
-```{code-cell} ipython3
+```python
 def T(v: np.ndarray, model: Model) -> np.ndarray:
     """
     The Bellman operator Tv = max{e, c + β P v} with
@@ -176,7 +177,7 @@ Here $\mathbf 1$ is an indicator function.
 * $\sigma(w) = 1$ means stop (accept)
 * $\sigma(w) = 0$ means continue.
 
-```{code-cell} ipython3
+```python
 def get_greedy(v: np.ndarray, model: Model) -> np.ndarray:
     "Get a v-greedy policy."
     n, w_vals, P, β, c = model
@@ -188,7 +189,7 @@ def get_greedy(v: np.ndarray, model: Model) -> np.ndarray:
 
 Here's a routine for value function iteration.
 
-```{code-cell} ipython3
+```python
 def vfi(
         model: Model,
         max_iter: int = 10_000,
@@ -220,7 +221,7 @@ def vfi(
 
 Let's set up and solve the model.
 
-```{code-cell} ipython3
+```python
 model = create_js_model()
 n, w_vals, P, β, c = model
 
@@ -229,7 +230,7 @@ v_star, σ_star = vfi(model, verbose=True)
 
 Here's the optimal policy:
 
-```{code-cell} ipython3
+```python
 fig, ax = plt.subplots()
 ax.plot(w_vals, σ_star)
 ax.set_xlabel("wage values")
@@ -240,7 +241,7 @@ plt.show()
 For context, we can plot it against the stationary distribution of the wage
 offer process.
 
-```{code-cell} ipython3
+```python
 mc = qe.MarkovChain(P, state_values=w_vals)
 ψ = mc.stationary_distributions[0]
 fig, ax = plt.subplots()
@@ -253,7 +254,7 @@ plt.show()
 
 Let's compute the runtime as well, averaging over a number of iterations
 
-```{code-cell} ipython3
+```python
 runtimes = []
 for _ in range(10):
     start = time.time()
@@ -268,22 +269,22 @@ print()
 
 We compute the reservation wage as the first $w$ such that $\sigma(w)=1$.
 
-```{code-cell} ipython3
+```python
 stop_indices = np.where(σ_star == 1)[0]
 stop_indices
 ```
 
-```{code-cell} ipython3
+```python
 res_wage_index = min(stop_indices)
 ```
 
-```{code-cell} ipython3
+```python
 res_wage = w_vals[res_wage_index]
 ```
 
 Here's a joint plot of the value function and the reservation wage.
 
-```{code-cell} ipython3
+```python
 fig, ax = plt.subplots()
 ax.plot(w_vals, v_star, alpha=0.8, label="value function")
 ax.vlines((res_wage,), 150, 400, 'k', ls='--', label="reservation wage")
@@ -322,7 +323,7 @@ Try to interpret your result.
 
 You can start with the following code:
 
-```{code-cell} ipython3
+```python
 class RiskModel(NamedTuple):
     n: int
     w_vals: np.ndarray
@@ -348,16 +349,16 @@ def create_risk_sensitive_js_model(
 
 Now you need to modify `T` and `get_greedy` and then run value function iteration again.
 
-```{code-cell} ipython3
+```python
 # Put your code here
 ```
 
-```{code-cell} ipython3
+```python
 for _ in range(25):
     print("Solution below!")
 ```
 
-```{code-cell} ipython3
+```python
 def T_rs(v: np.ndarray, model: RiskModel) -> np.ndarray:
     """
     The Bellman operator Tv = max{e, c + β R v} with
@@ -413,13 +414,13 @@ v_star_rs, σ_star_rs = vfi_rs(model_rs)
 
 Let's plot the results together with the original risk neutral case and see what we get.
 
-```{code-cell} ipython3
+```python
 stop_indices = np.where(σ_star_rs == 1)
 res_wage_index = min(stop_indices[0])
 res_wage_rs = w_vals[res_wage_index]
 ```
 
-```{code-cell} ipython3
+```python
 fig, ax = plt.subplots()
 ax.plot(w_vals, v_star,  ls='-', color='blue',
         alpha=0.8, label="risk neutral $v$")
@@ -439,7 +440,6 @@ The figure shows that the reservation wage under risk sensitive preferences (RS 
 This makes sense -- the agent does not like risk and hence is more inclined to
 accept the current offer, even when it's lower.
 
-+++
 
 ## Exercise 2
 
@@ -450,12 +450,12 @@ This is poor style because we are repeating logic.
 Write one version of VFI that can work with both and test that it does the
 same job.
 
-```{code-cell} ipython3
+```python
 for _ in range(15):
     print("Solution below!")
 ```
 
-```{code-cell} ipython3
+```python
 def generic_vfi(
         bellman_operator: Callable,
         get_greedy_function: Callable,
@@ -485,7 +485,7 @@ def generic_vfi(
 
 Let's test this with the original model (comparing the output of `vfi` and `generic_vfi`).
 
-```{code-cell} ipython3
+```python
 model = create_js_model()
 n, w_vals, P, β, c = model
 v_star_0, σ_star_0 = vfi(model)
@@ -502,7 +502,7 @@ print(f"Success = {correct}")
 
 Let's also test this set up with the risk sensitive model (comparing the output of `vfi_rs` and `generic_vfi`).
 
-```{code-cell} ipython3
+```python
 model = create_risk_sensitive_js_model()
 n, w_vals, P, β, c, θ = model_rs
 v_star_0, σ_star_0 = vfi_rs(model)
@@ -517,6 +517,3 @@ correct = np.allclose(v_star_0, v_star_1) and np.allclose(σ_star_0, σ_star_1)
 print(f"Success = {correct}")
 ```
 
-```{code-cell} ipython3
-
-```

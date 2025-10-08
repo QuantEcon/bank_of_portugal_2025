@@ -1,14 +1,16 @@
 ---
-jupytext:
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.17.2
-kernelspec:
-  display_name: Python 3 (ipykernel)
-  language: python
-  name: python3
+jupyter:
+  jupytext:
+    default_lexer: ipython3
+    text_representation:
+      extension: .md
+      format_name: markdown
+      format_version: '1.3'
+      jupytext_version: 1.17.2
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
 ---
 
 # Finite Markov Chains
@@ -31,19 +33,15 @@ kernelspec:
 ## Overview
 
 
-In this lecture, we 
+In this lecture, we review working with Markov chains in Python.
 
-* review some of the theory of Markov chains.
-* implement key ideas in Python
-* introduce some of the routines for working with Markov chains available in [QuantEcon.py](https://quantecon.org/quantecon-py/).
-
-```{code-cell} ipython3
+```python
 #!pip install quantecon  # Uncomment if needed
 ```
 
 Let’s start with some imports:
 
-```{code-cell} ipython3
+```python
 import matplotlib.pyplot as plt
 import quantecon as qe
 import numpy as np
@@ -110,8 +108,6 @@ chain $ \{X_t\} $ as follows:
 - draw $ X_0 $ from a marginal distribution $ \psi $  
 - for each $ t = 0, 1, \ldots $, draw $ X_{t+1} $ from $ P(X_t,\cdot) $
 
-+++
-
 ### Example 1
 
 Consider a worker who, at any given time $ t $, is either unemployed (state 0) or employed (state 1).
@@ -127,16 +123,15 @@ In terms of a Markov model, we have
 - $ S = \{ 0, 1\} $
 - $ P(0, 1) = f $ and $ P(1, 0) = s $  
 
-
 We can write out the transition probabilities in matrix form as
 
 $$
 P
 = \left(
-\begin{array}{cc}
-    1 - f & f \\
-    s      & 1 - s
-\end{array}
+    \begin{array}{cc}
+        1 - f & f \\
+        s      & 1 - s
+    \end{array}
   \right)
 $$
 
@@ -146,8 +141,6 @@ Once we have the values $ f $ and $ s $, we can address a range of questions, su
 - Over the long-run, what fraction of time does a worker find herself unemployed?  
 
 We'll see how to do this below.
-
-+++
 
 ### Example 2
 
@@ -179,29 +172,26 @@ This Markov process can also be represented as a directed graph, with edges labe
 
 ![https://python.quantecon.org/_static/lecture_specific/finite_markov/hamilton_graph.png](https://python.quantecon.org/_static/lecture_specific/finite_markov/hamilton_graph.png)
 
-  
+
 
 ## Simulation
 
 One natural way to study Markov chains is to simulate them.
 
-(The LLN tells us that to approximate the probability of event $ E $, we can simulate many times and count the fraction of times that $ E $ occurs).
-
 Let's start by writing our own routines for generating sample paths (Markov chains).
 
-(Later we'll use routines in [QuantEcon.py](http://quantecon.org/quantecon-py).)
-
-In these exercises, we’ll take the state space to be $ S = 0,\ldots, n-1 $.
-
-+++
+In these exercises, we’ll take the state space to be $S = 0,\ldots, n-1$.
 
 ### Rolling Our Own
 
-To simulate a Markov chain, we need its stochastic matrix $ P $ and a marginal probability distribution $ \psi $  from which to  draw a realization of $ X_0 $.
+To simulate a Markov chain, we need 
 
-The Markov chain is then constructed as discussed above.  To repeat:
+- its stochastic matrix $ P $ and 
+- a distribution $ \psi_0 $ on $S$ from which to draw $ X_0 $.
 
-1. At time $ t=0 $, draw a realization of  $ X_0 $  from $ \psi $.  
+The Markov chain is then constructed as discussed above:
+
+1. At time $ t=0 $, draw a realization of  $ X_0 $  from $ \psi_0 $.  
 1. At each subsequent time $ t $, draw a realization of the new state $ X_{t+1} $ from $ P(X_t, \cdot) $.  
 
 
@@ -209,7 +199,7 @@ To implement this simulation procedure, we need a method for generating draws fr
 
 For this task, we’ll use `random.draw` from [QuantEcon](http://quantecon.org/quantecon-py), which is accelerated by Numba and works as follows:
 
-```{code-cell} ipython3
+```python
 ψ = (0.3, 0.7)           # Probabilities over {0, 1}
 cdf = np.cumsum(ψ)       # Convert into cummulative distribution
 qe.random.draw(cdf, 5)   # Generate 5 independent draws from ψ
@@ -221,12 +211,11 @@ We’ll write our code as a function that accepts the following three arguments
 - An initial state `init`  
 - A positive integer `sample_size` representing the length of the time series the function should return
 
-```{code-cell} ipython3
+```python
 def mc_sample_path(P, ψ_0=None, sample_size=1_000):
     """
     Generate a sample path of a finite state Markov chain with transition matrix
     P and initial distribution ψ_0.
-
 
     If ψ_0 is set to None then the initial draw will be uniform over the states.
 
@@ -234,7 +223,7 @@ def mc_sample_path(P, ψ_0=None, sample_size=1_000):
 
     # Set up
     P = np.asarray(P)
-    X = np.empty(sample_size, dtype=int)
+    X = np.empty(sample_size, dtype=np.int32)
 
     # draw initial state, defaulting to 0
     if ψ_0 is None:
@@ -256,7 +245,7 @@ def mc_sample_path(P, ψ_0=None, sample_size=1_000):
 
 Let’s see how it works using the small matrix
 
-```{code-cell} ipython3
+```python
 P = [[0.4, 0.6],
      [0.2, 0.8]]
 ```
@@ -265,16 +254,15 @@ As we’ll see later, for a long series drawn from `P`, the fraction of the samp
 
 The following code illustrates this
 
-```{code-cell} ipython3
+```python
 %%time
 
 X = mc_sample_path(P, ψ_0=(0.1, 0.9), sample_size=1_000_000)
 np.mean(X == 0)  # Fraction of time that X_t = 0
 ```
 
-Here we chose a particular initial condition but the result holds regardless of the initial distribution.
+The outcome will be close to 0.25 regardless of the initial distribution.
 
-You can try changing the initial distribution to confirm this.
 
 
 ### Using QuantEcon’s Routines
@@ -283,7 +271,7 @@ You can try changing the initial distribution to confirm this.
 
 Here’s an illustration using the same P as the preceding example
 
-```{code-cell} ipython3
+```python
 from quantecon import MarkovChain
 
 mc = qe.MarkovChain(P)
@@ -291,13 +279,14 @@ X = mc.simulate(ts_length=1_000_000)
 np.mean(X == 0)
 ```
 
-The [QuantEcon.py](http://quantecon.org/quantecon-py) routine is [JIT compiled](https://python-programming.quantecon.org/numba.html#numba-link) and hence faster.
+The [QuantEcon.py](http://quantecon.org/quantecon-py) routine is JIT compiled
+and hence faster.
 
-```{code-cell} ipython3
+```python
 %time mc_sample_path(P, sample_size=1_000_000) # Our homemade version
 ```
 
-```{code-cell} ipython3
+```python
 %time mc.simulate(ts_length=1_000_000)         # QE version
 ```
 
@@ -305,14 +294,11 @@ The [QuantEcon.py](http://quantecon.org/quantecon-py) routine is [JIT compiled](
 
 Try producing your own JIT compiled version of our homemade function `mc_sample_path`, using Numba.
 
-Hints:
-
-- You might need to replace `dtype=int` with `dtype=numba.int32` or similar
-- To simplify logic, you can replace `ψ_0=None` with `ψ_0` and assume the initial distribution is always passed in.
+To simplify logic, you can replace `ψ_0=None` with `ψ_0` and assume the initial distribution is always passed in.
 
 How does the timing compare to the original and the QuantEcon routine?
 
-```{code-cell} ipython3
+```python
 for i in range(12):
     print("Solution below.")
 ```
@@ -321,14 +307,14 @@ for i in range(12):
 
 Here's one solution.
 
-```{code-cell} ipython3
+```python
 @numba.jit
 def mc_sample_path_fast(P, ψ_0,  sample_size=1_000):
 
     # Set up
     P = np.asarray(P)
     ψ_0 = np.asarray(ψ_0)
-    X = np.empty(sample_size, dtype=numba.int64)
+    X = np.empty(sample_size, dtype=np.int64)
 
     # draw initial state
     ψ_0 = np.cumsum(ψ_0)
@@ -352,17 +338,17 @@ P = [[0.4, 0.6],
 P, ψ_0 = np.asarray(P), np.asarray(ψ_0)
 ```
 
-```{code-cell} ipython3
+```python
 %time mc_sample_path_fast(P, ψ_0, sample_size=1_000_000)
 ```
 
-```{code-cell} ipython3
+```python
 %time mc_sample_path_fast(P, ψ_0, sample_size=1_000_000)
 ```
 
 Incidentally, we can also hold the stochastic matrix as state in a jitted function as follows.
 
-```{code-cell} ipython3
+```python
 def mc_sample_path_factory(P, ψ_0):
 
     # Set up
@@ -393,11 +379,11 @@ def mc_sample_path_factory(P, ψ_0):
 mc_sample_path_closure = mc_sample_path_factory(P, ψ_0)
 ```
 
-```{code-cell} ipython3
+```python
 %time mc_sample_path_closure(sample_size=1_000_000)
 ```
 
-```{code-cell} ipython3
+```python
 %time mc_sample_path_closure(sample_size=1_000_000)
 ```
 
@@ -430,8 +416,6 @@ $$
     X_0 \sim \psi_0 \quad \implies \quad X_m \sim \psi_0 P^m 
 $$
 
-+++
-
 ### Example: Probability of Recession
 
 Recall Hamilton's stochastic matrix $ P $ for recession and growth considered above
@@ -456,18 +440,20 @@ $$
 
 Let's compute this when
 
-```{code-cell} ipython3
+```python
 ψ = (0.2, 0.4, 0.4)
 ```
 
 To compute $P^6$ we use `np.power`.
 
-```{code-cell} ipython3
+```python
 P = ((0.971, 0.029, 0.0), 
      (0.145, 0.778, 0.077), 
      (0.0,   0.508, 0.492))
+
 pr = ψ @ np.power(P, 6) @ (0, 1, 1)
-print(f"Probability of recession = {pr:.4f}.")
+
+print(f"Probability of recession in 6 months = {pr:.4f}.")
 ```
 
 ### Irreducibility
@@ -498,7 +484,7 @@ households
 
 ![https://python.quantecon.org/_static/lecture_specific/finite_markov/mc_irreducibility1.png](https://python.quantecon.org/_static/lecture_specific/finite_markov/mc_irreducibility1.png)
 
-  
+
 We can translate this into a stochastic matrix, putting zeros where
 there’s no edge between nodes
 
@@ -518,7 +504,7 @@ reach any state from any other state.
 
 We can also test this using [QuantEcon.py](http://quantecon.org/quantecon-py)’s MarkovChain class
 
-```{code-cell} ipython3
+```python
 P_1 = [[0.9, 0.1, 0.0],
       [0.4, 0.4, 0.2],
       [0.1, 0.1, 0.8]]
@@ -531,12 +517,12 @@ Here’s a more pessimistic scenario in which  poor people remain poor forever
 
 ![https://python.quantecon.org/_static/lecture_specific/finite_markov/mc_irreducibility2.png](https://python.quantecon.org/_static/lecture_specific/finite_markov/mc_irreducibility2.png)
 
-  
+
 This stochastic matrix is not irreducible, since, for example, rich is not accessible from poor.
 
 Let’s confirm this
 
-```{code-cell} ipython3
+```python
 P_2 = [[1.0, 0.0, 0.0],
       [0.1, 0.8, 0.1],
       [0.0, 0.2, 0.8]]
@@ -551,37 +537,37 @@ For example, poverty is a life sentence in the second graph but not the first.
 
 **Exercise**
 
-It's also true that an $n \times n$ stochastic matrix $P$ is irreducible if and only if $\sum_{i=0}^n P^i$ is everwhere positive.  
+It's also true that an $n \times n$ stochastic matrix $P$ is irreducible if and only if $\sum_{i=0}^{n-1} P^i$ is everwhere positive.  
 
 Write a function that checks irreducibility of given $P$ using this result and test it on $P_1$ and $P_2$ above.
 
-```{code-cell} ipython3
+```python
 # Put your code here
 ```
 
-```{code-cell} ipython3
+```python
 for i in range(12):
     print("Solution below.")
 ```
 
 **Solution**
 
-```{code-cell} ipython3
+```python
 def is_irreducible(P):
     S = np.zeros_like(P)
     n = len(P)
     A = np.identity(n)
-    for i in range(n+1):
+    for i in range(n):
         S += A
         A = A @ P
     return np.all(S > 0)
 ```
 
-```{code-cell} ipython3
+```python
 print(is_irreducible(P_1))
 ```
 
-```{code-cell} ipython3
+```python
 print(is_irreducible(P_2))
 ```
 
@@ -593,10 +579,10 @@ Here’s a trivial example with three states
 
 ![https://python.quantecon.org/_static/lecture_specific/finite_markov/mc_aperiodicity1.png](https://python.quantecon.org/_static/lecture_specific/finite_markov/mc_aperiodicity1.png)
 
-  
+
 The chain cycles with period 3:
 
-```{code-cell} ipython3
+```python
 P = [[0, 1, 0],
      [0, 0, 1],
      [1, 0, 0]]
@@ -622,7 +608,7 @@ For example, the stochastic matrix associated with the transition probabilities 
 
 We can confirm that the stochastic matrix is periodic with the following code
 
-```{code-cell} ipython3
+```python
 P = [[0.0, 1.0, 0.0, 0.0],
      [0.5, 0.0, 0.5, 0.0],
      [0.0, 0.5, 0.0, 0.5],
@@ -631,8 +617,12 @@ P = [[0.0, 1.0, 0.0, 0.0],
 mc = qe.MarkovChain(P)
 ```
 
-```{code-cell} ipython3
+```python
 mc.is_aperiodic
+```
+
+```python
+mc.period
 ```
 
 ## Stationary Distributions
@@ -642,7 +632,7 @@ We know that we can shift a marginal distribution forward one unit of time via p
 
 Some distributions are invariant under this updating process — for example,
 
-```{code-cell} ipython3
+```python
 P = np.array([[0.4, 0.6],
               [0.2, 0.8]])
 ψ = (0.25, 0.75)
@@ -660,7 +650,7 @@ Formally, a marginal distribution $ \psi^* $ on $ S $ is called **stationary** f
 
 Proof:  This follows directly from the Perron-Frobenius theorem -- alternatively, see [EDTC](https://johnstachurski.net/edtc.html), theorem 4.3.5.
 
-What's an example of a stochastic matrix with many stationary distributions?
+
 
 
 **Theorem.** If $ P $ is both aperiodic and irreducible, then
@@ -676,8 +666,6 @@ For a proof, see, for example, theorem 5.2 of [[Haggstrom02](https://python.quan
 A stochastic matrix that satisfies the conditions of the theorem is sometimes called **uniformly ergodic**.
 
 A sufficient condition for aperiodicity and irreducibility is that every element of $ P $ is strictly positive.
-
-+++
 
 ### Example
 
@@ -697,8 +685,6 @@ This is, in some sense, a steady state probability of unemployment — more abou
 
 Not surprisingly it tends to zero as $ s \to 0 $, and to one as $ f \to 0 $.
 
-+++
-
 ### Calculating Stationary Distributions
 
 
@@ -706,7 +692,7 @@ As discussed above, a particular Markov matrix $ P $ can have many stationary di
 
 A fast algorithm for computing all stationary distributions is implemented in [QuantEcon.py](http://quantecon.org/quantecon-py).
 
-```{code-cell} ipython3
+```python
 P = [[0.4, 0.6],
      [0.2, 0.8]]
 
@@ -716,11 +702,14 @@ mc.stationary_distributions  # Show all stationary distributions
 
 **Exercise**
 
-+++
 
 Another option is to regard the system as an eigenvector problem: a vector
 $ \psi $ such that $ \psi = \psi P $ is a left eigenvector associated
 with the unit eigenvalue $ \lambda = 1$.
+
+In fact, for a stochastic matrix, the largest left eigenvalue is 1.0 and the corresponding eigenvector is the stationary distribution.
+
+(It becomes a distribution after being normalized, so that it sums to one.)
 
 Try writing a function that uses this information to compute the stationary distribution of $P$.
 
@@ -728,25 +717,23 @@ You can use `scipy.linalg.eig` from SciPy.
 
 In the exercise you can assume that $P$ has only one stationary distribution, and you can test your function using
 
-```{code-cell} ipython3
+```python
 P = np.array([[0.4, 0.6],
               [0.2, 0.8]])
 ```
 
-```{code-cell} ipython3
+```python
 for i in range(12):
     print("Solution below!")
 ```
 
 **Solution**
 
-```{code-cell} ipython3
+```python
 def compute_stationary_via_eigenvecs(P):
     """
     Computes the stationary distribution of P using an eigenvector routine.
 
-    We use the fact that, for a stochastic matrix, the largest left eigenvalue is 1.0.
-    The corresponding eigenvector is the stationary distribution.
     """
     P = np.array(P)
     eigenvalues, eigenvectors = sp.linalg.eig(P.T)     # transpose for left eigenvectors
@@ -756,7 +743,7 @@ def compute_stationary_via_eigenvecs(P):
     return np.real(ψ_star)  # return real part
 ```
 
-```{code-cell} ipython3
+```python
 ψ_star = compute_stationary_via_eigenvecs(P)
 ψ_star
 ```
@@ -772,7 +759,7 @@ This adds considerable authority to our interpretation of $ \psi^* $ as a stocha
 
 The convergence in the theorem is illustrated in the next figure
 
-```{code-cell} ipython3
+```python
 P = ((0.971, 0.029, 0.000),
      (0.145, 0.778, 0.077),
      (0.000, 0.508, 0.492))
@@ -815,6 +802,6 @@ Here
 
 You might like to try experimenting with different initial conditions.
 
-```{code-cell} ipython3
+```python
 
 ```

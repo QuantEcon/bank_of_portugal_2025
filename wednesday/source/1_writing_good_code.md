@@ -1,14 +1,16 @@
 ---
-jupytext:
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.17.2
-kernelspec:
-  name: python3
-  display_name: Python 3 (ipykernel)
-  language: python
+jupyter:
+  jupytext:
+    default_lexer: ipython3
+    text_representation:
+      extension: .md
+      format_name: markdown
+      format_version: '1.3'
+      jupytext_version: 1.17.2
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
 ---
 
 # Writing Good Code
@@ -16,8 +18,6 @@ kernelspec:
 
 Any fool can write code that a computer can understand. Good programmers write
 code that humans can understand. – Martin Fowler
-
-+++
 
 ## Overview
 
@@ -27,8 +27,6 @@ But more data, more sophisticated models, and more computer power are enabling
 us to take on more challenging problems that involve writing longer programs.
 
 For such programs, investment in good coding practices will pay high returns.
-
-+++
 
 ## An Example of Poor Code
 
@@ -57,7 +55,7 @@ The plots will be grouped into three subfigures.
 
 In each subfigure, two parameters are held fixed while another varies
 
-```{code-cell} ipython3
+```python
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -126,13 +124,11 @@ At the same time, it’s very poorly structured.
 
 Let’s talk about why that’s the case, and what we can do about it.
 
-+++
 
 ## Good Coding Practice
 
 Here are some basic precepts.
 
-+++
 
 ### Don’t Use Magic Numbers
 
@@ -147,16 +143,15 @@ This is not a compliment.
 While numeric literals are not all evil, the numbers shown in the program above
 should certainly be replaced by named constants.
 
-For example, the code above could declare the variable `time_series_length = 50`.
+For example, the code above could declare the variable `ts_length = 50`.
 
-Then in the loops, `49` should be replaced by `time_series_length - 1`.
+Then in the loops, `49` should be replaced by `ts_length - 1`.
 
 The advantages are:
 
 - the meaning is much clearer throughout  
 - to alter the time series length, you only need to change one value
 
-+++
 
 ### Don’t Repeat Yourself
 
@@ -174,7 +169,6 @@ But as a programmer, your aim should be to **automate** repetition, **not** do i
 
 More importantly, repeating the same logic in different places means that eventually one of them will likely be wrong.
 
-+++
 
 ### Minimize Global Variables
 
@@ -194,7 +188,6 @@ teach yourself to avoid them.
 
 (We’ll discuss how just below).
 
-+++
 
 #### JIT Compilation
 
@@ -208,7 +201,6 @@ variables are present.
 Put differently, the type inference required for JIT compilation is safer and
 more effective when variables are sandboxed inside a function.
 
-+++
 
 ### Use Functions 
 
@@ -221,13 +213,12 @@ We can do this by making frequent use of functions or classes.
 In fact, functions are designed specifically to help us avoid shaming ourselves
 by repeating code or excessive use of global variables.
 
-+++
 
 ## Revisiting the Example
 
 Here’s some code that reproduces the plot above with better coding style.
 
-```{code-cell} ipython3
+```python
 def simulate_solow(α, s, δ, ts_length=50):
     """Simulate the Solow model."""
     k = np.empty(ts_length)
@@ -243,8 +234,9 @@ def plot_solow(ax, vary_param, param_vals, α=0.33, s=0.4, δ=0.1):
         params = {'α': α, 's': s, 'δ': δ}
         params[vary_param] = val
         k = simulate_solow(**params)
-        label = (rf"$\alpha = {params['α']},\; s = {params['s']},\; "
-                 rf"\delta={params['δ']}$")
+        label = (rf"$α = {params['α']},\; "
+                  rf"s = {params['s']},\; "
+                  rf"δ = {params['δ']}$")
         ax.plot(k, 'o-', label=label)
 
     ax.grid(lw=0.2)
@@ -266,18 +258,12 @@ plt.show()
 
 If you inspect this code, you will see that
 
-- it uses a function to avoid repetition.  
+- it uses functions to avoid repetition and break up logical components.  
 - Global variables are quarantined by collecting them together at the end, not the start of the program.  
 - Magic numbers are avoided.  
-- The loop at the end where the actual work is done is short and relatively simple.
 
-+++
 
-## Exercises
-
-+++
-
-## Exercise 20.1
+## Exercise
 
 Here is some code that needs improving.
 
@@ -286,31 +272,27 @@ It involves a basic supply and demand problem.
 Supply is given by
 
 $$
-q_s(p) = \exp(\alpha p) - \beta.
+    q_s(p) = \exp(\alpha p) - \beta.
 $$
 
 The demand curve is
 
 $$
-q_d(p) = \gamma p^{-\delta}.
+    q_d(p) = \gamma p^{-\delta}.
 $$
 
-The values $ \alpha $, $ \beta $, $ \gamma $ and
-$ \delta $ are **parameters**
 
-The equilibrium $ p^* $ is the price such that
-$ q_d(p) = q_s(p) $.
+The equilibrium $ p^* $ is the price such that $ q_d(p) = q_s(p) $.
 
-We can solve for this equilibrium using a root finding algorithm.
-Specifically, we will find the $ p $ such that $ h(p) = 0 $,
-where
+The equilibrium quantity is then $ q^* = q_s(p^*) $
+
+We can solve for the equilibrium using a root finding algorithm.
+
+Specifically, we will find the $ p $ such that $ h(p) = 0 $, where
 
 $$
-h(p) := q_d(p) - q_s(p)
+    h(p) := q_d(p) - q_s(p)
 $$
-
-This yields the equilibrium price $ p^* $. From this we get the
-equilibrium quantity by $ q^* = q_s(p^*) $
 
 The parameter values will be
 
@@ -319,7 +301,8 @@ The parameter values will be
 - $ \gamma = 1 $  
 - $ \delta = 1 $
 
-```{code-cell} ipython3
+
+```python
 from scipy.optimize import brentq
 
 # Compute equilibrium
@@ -335,7 +318,7 @@ print(f'Equilibrium quantity is {q_star: .2f}')
 
 Let’s also plot our results.
 
-```{code-cell} ipython3
+```python
 # Now plot
 grid = np.linspace(2, 4, 100)
 fig, ax = plt.subplots()
@@ -358,7 +341,7 @@ We also want to consider supply and demand shifts.
 
 For example, let’s see what happens when demand shifts up, with $ \gamma $ increasing to $ 1.25 $:
 
-```{code-cell} ipython3
+```python
 # Compute equilibrium
 def h(p):
     return 1.25 * p**(-1) - (np.exp(0.1 * p) - 1)
@@ -370,7 +353,7 @@ print(f'Equilibrium price is {p_star: .2f}')
 print(f'Equilibrium quantity is {q_star: .2f}')
 ```
 
-```{code-cell} ipython3
+```python
 # Now plot
 p_grid = np.linspace(2, 4, 100)
 fig, ax = plt.subplots()
@@ -395,18 +378,18 @@ a lot of repeated code here.
 Refactor and improve clarity in the code above using the principles discussed
 in this lecture.
 
-```{code-cell} ipython3
+```python
 # Put your code here
 ```
 
-```{code-cell} ipython3
+```python
 for _ in range(20):
     print("Solution below!")
 ```
 
 Here’s one solution.
 
-```{code-cell} ipython3
+```python
 from typing import NamedTuple
 
 class EquilibriumModel(NamedTuple):
@@ -426,9 +409,8 @@ def compute_equilibrium(model):
         return qd(model, p) - qs(model, p)
     p_star = brentq(h, 2, 4)
     q_star = np.exp(model.α * p_star) - model.β
+    return p_star, q_star
 
-    print(f'Equilibrium price is {p_star: .2f}')
-    print(f'Equilibrium quantity is {q_star: .2f}')
 
 def plot_equilibrium(model):
     # Now plot
@@ -447,35 +429,35 @@ def plot_equilibrium(model):
 
 Let’s create an instance at the default parameter values.
 
-```{code-cell} ipython3
+```python
 model = EquilibriumModel()
 ```
 
 Now we’ll compute the equilibrium and plot it.
 
-```{code-cell} ipython3
-compute_equilibrium(model)
+```python
+p_star, q_star = compute_equilibrium(model)
+print(f'Equilibrium price is {p_star: .2f}')
+print(f'Equilibrium quantity is {q_star: .2f}')
 ```
 
-```{code-cell} ipython3
+```python
 plot_equilibrium(model)
 ```
 
 One of the nice things about our refactored code is that, when we change
 parameters, we don’t need to repeat ourselves:
 
-```{code-cell} ipython3
+```python
 model = EquilibriumModel(γ=1.25)
 ```
 
-```{code-cell} ipython3
-compute_equilibrium(model)
+```python
+p_star, q_star = compute_equilibrium(model)
+print(f'Equilibrium price is {p_star: .2f}')
+print(f'Equilibrium quantity is {q_star: .2f}')
 ```
 
-```{code-cell} ipython3
+```python
 plot_equilibrium(model)
-```
-
-```{code-cell} ipython3
-
 ```

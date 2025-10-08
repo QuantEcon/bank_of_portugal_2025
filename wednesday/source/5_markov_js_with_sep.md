@@ -1,14 +1,16 @@
 ---
-jupytext:
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.17.2
-kernelspec:
-  display_name: Python 3 (ipykernel)
-  language: python
-  name: python3
+jupyter:
+  jupytext:
+    default_lexer: ipython3
+    text_representation:
+      extension: .md
+      format_name: markdown
+      format_version: '1.3'
+      jupytext_version: 1.17.2
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
 ---
 
 # Job Search with Separation
@@ -17,8 +19,7 @@ kernelspec:
 
 **Author:** [John Stachurski](https://johnstachurski.net)
 
-This module solves for the optimal policy of an agent who can be either
-unemployed or employed. 
+We study a job search model with separation using NumPy and Numba.
 
 ## Model Setup
 
@@ -32,7 +33,6 @@ unemployed or employed.
 - Unemployed workers receive compensation $c$ each period
 - Future payoffs discounted by factor $\beta \in (0,1)$
 
-+++
 
 ## Decision Problem
 
@@ -40,8 +40,6 @@ When unemployed and receiving wage offer $w$, the agent chooses between:
 
 1. Accept offer $w$ and work at this wage until separation
 2. Reject offer: Remain unemployed, receive $c$, get new offer next period
-
-+++
 
 ## Value Functions
 
@@ -71,8 +69,6 @@ $$v_e = \vec w + \beta[\alpha P v_u + (1-\alpha) v_e]$$
 
 Here $\vec w$ is a vector containing the list of possible wage offers.
 
-+++
-
 ## Computational Approach
 
 1. Solve the employed value function in terms of $v_u$:
@@ -89,19 +85,18 @@ Here $\vec w$ is a vector containing the list of possible wage offers.
 The optimal policy is a reservation wage strategy: accept all wages above
 some threshold $\bar w$.
 
-+++
 
 ## Code
 
 In addition to what's in Anaconda, this lecture will need the QE library:
 
-```{code-cell} ipython3
-!pip install quantecon  
+```python
+#!pip install quantecon  # Uncomment if necessary
 ```
 
 We use the following imports:
 
-```{code-cell} ipython3
+```python
 from quantecon.markov import tauchen
 import numpy as np
 from typing import NamedTuple, Callable, Union
@@ -111,7 +106,7 @@ import numba
 
 First, we implement the successive approximation algorithm:
 
-```{code-cell} ipython3
+```python
 def successive_approx(
         T: Callable,               # Operator
         x_0: np.ndarray,           # Initial condition
@@ -142,7 +137,7 @@ def successive_approx(
 
 Let's set up a `Model` class to store information needed to solve the model:
 
-```{code-cell} ipython3
+```python
 class Model(NamedTuple):
     n: int
     w_vals: np.ndarray
@@ -154,7 +149,7 @@ class Model(NamedTuple):
 
 The function below holds default values and creates a `Model` instance:
 
-```{code-cell} ipython3
+```python
 def create_js_with_sep_model(
         n: int = 200,          # wage grid size
         ρ: float = 0.9,        # wage persistence
@@ -169,9 +164,17 @@ def create_js_with_sep_model(
     return Model(n, w_vals, P, β, c, α)
 ```
 
-Here's the Bellman operator for the unemployed worker's value function:
+Here's the Bellman operator for the unemployed worker's value function.
 
-```{code-cell} ipython3
+It implements the map
+
+$$
+    Tv_u = \max\left\{
+    \frac{1}{1-\beta(1-\alpha)} \cdot (\vec w + \alpha\beta Pv_u), c + \beta Pv_u 
+    \right\}
+$$
+
+```python
 @numba.jit
 def T(v: np.ndarray, model: Model) -> np.ndarray:
     """The Bellman operator for the value of being unemployed."""
@@ -185,7 +188,7 @@ def T(v: np.ndarray, model: Model) -> np.ndarray:
 The next function computes the optimal policy under the assumption that v is
 the value function:
 
-```{code-cell} ipython3
+```python
 @numba.jit
 def get_greedy(v: np.ndarray, model: Model) -> np.ndarray:
     """Get a v-greedy policy."""
@@ -199,7 +202,7 @@ def get_greedy(v: np.ndarray, model: Model) -> np.ndarray:
 
 Here's a routine for value function iteration:
 
-```{code-cell} ipython3
+```python
 def vfi(model: Model, verbose: bool = False):
     """Solve by VFI."""
     v_init = np.zeros(model.w_vals.shape)
@@ -210,7 +213,7 @@ def vfi(model: Model, verbose: bool = False):
 
 Here's a function to compute the reservation wage given a policy $\sigma$
 
-```{code-cell} ipython3
+```python
 def get_reservation_wage(σ: np.ndarray, model: Model) -> float:
     """
     Calculate the reservation wage from a given policy.
@@ -238,7 +241,7 @@ def get_reservation_wage(σ: np.ndarray, model: Model) -> float:
 
 Let's solve the model and plot the results:
 
-```{code-cell} ipython3
+```python
 model = create_js_with_sep_model()
 n, w_vals, P, β, c, α = model
 v_star, σ_star = vfi(model)
@@ -260,23 +263,38 @@ ax.set_xlabel(r"$w$")
 plt.show()
 ```
 
-## Sensitivity Analysis
+## Exercise
 
-Let's examine how reservation wages change with the separation rate α:
+Examine how reservation wages change with the separation rate α.  
 
-```{code-cell} ipython3
+Interpret your results.  Start with
+
+```python
 α_vals: np.ndarray = np.linspace(0.0, 1.0, 10)
+```
 
+```python
+# Put your code here
+```
+
+```python
+for _ in range(20):
+    print("Solution below.")
+```
+
+```python
 w_star_vec = np.empty_like(α_vals)
-for (i_α, α) in enumerate(α_vals):
+
+for i_α, α in enumerate(α_vals):
     model = create_js_with_sep_model(α=α)
     v_star, σ_star = vfi(model)
     w_star = get_reservation_wage(σ_star, model)
     w_star_vec[i_α] = w_star
 
 fig, ax = plt.subplots()
-ax.plot(α_vals, w_star_vec, linewidth=2, alpha=0.6,
-        label="reservation wage")
+ax.plot(
+    α_vals, w_star_vec, linewidth=2, alpha=0.6, label="reservation wage"
+)
 ax.legend(frameon=False)
 ax.set_xlabel(r"$\alpha$")
 ax.set_ylabel(r"$w$")
@@ -287,7 +305,7 @@ plt.show()
 
 Now let's simulate the employment dynamics of a single agent under the optimal policy:
 
-```{code-cell} ipython3
+```python
 @numba.jit
 def weighted_choice(probs):
     """Numba-compatible weighted random choice."""
@@ -300,22 +318,18 @@ def update_agent(is_employed, wage_idx, model, σ_star):
     n, w_vals, P, β, c, α = model
 
     if is_employed: # Employed update
-
         # Separation => become unemployed and draw new wage
         if np.random.random() < α:
             is_employed = False
             wage_idx = weighted_choice(P[wage_idx, :])
-
         # No separation => employment status and wage unchanged
         else:
             pass
 
     else: # Unemployed update
-
         # Accept => become employed and hold wage unchanged
         if σ_star[wage_idx]:
             is_employed = True
-
         # Reject => stay unemployed and update wage
         else:
             wage_idx = weighted_choice(P[wage_idx, :])
@@ -323,7 +337,7 @@ def update_agent(is_employed, wage_idx, model, σ_star):
     return is_employed, wage_idx
 ```
 
-```{code-cell} ipython3
+```python
 def simulate_employment_path(
         model: Model,     # Model detaisl
         T: int = 2_000,   # Simulation length
@@ -360,7 +374,7 @@ def simulate_employment_path(
 
 Let's create a comprehensive plot of the employment simulation:
 
-```{code-cell} ipython3
+```python
 model = create_js_with_sep_model()
 
 # Calculate reservation wage for plotting
@@ -428,7 +442,7 @@ The model successfully captures the essential features of labor market dynamics 
 
 Now let's simulate many agents simultaneously to examine the cross-sectional unemployment rate:
 
-```{code-cell} ipython3
+```python
 @numba.jit
 def simulate_cross_section_numba(
         employment_matrix, is_employed, wage_indices, model, σ_star,
@@ -522,16 +536,18 @@ def plot_cross_sectional_unemployment(model: Model):
     plt.show()
 ```
 
-```{code-cell} ipython3
+```python
 model = create_js_with_sep_model()
 plot_cross_sectional_unemployment(model)
 ```
 
-## Cross-Sectional Analysis with Lower Unemployment Compensation (c=0.5)
+<!-- #region -->
+
 
 Let's examine how the cross-sectional unemployment rate changes with lower unemployment compensation:
+<!-- #endregion -->
 
-```{code-cell} ipython3
+```python
 model_low_c = create_js_with_sep_model(c=0.5)
 plot_cross_sectional_unemployment(model_low_c)
 ```
@@ -541,18 +557,18 @@ plot_cross_sectional_unemployment(model_low_c)
 Create a plot that shows how the steady state cross-sectional unemployment rate
 changes with unemployment compensation.
 
-```{code-cell} ipython3
+```python
 # put your code here
 ```
 
-```{code-cell} ipython3
+```python
 for _ in range(20):
     print('Solution below!')
 ```
 
 ## Solution
 
-```{code-cell} ipython3
+```python
 c_values = 1.0, 0.8, 0.6, 0.4, 0.2
 rates = []
 for c in c_values:
@@ -561,7 +577,7 @@ for c in c_values:
     rates.append(unemployment_rates[-1])
 ```
 
-```{code-cell} ipython3
+```python
 fig, ax = plt.subplots()
 ax.plot(
     c_values, rates, alpha=0.8, 
@@ -571,6 +587,6 @@ ax.legend(frameon=False)
 plt.show()
 ```
 
-```{code-cell} ipython3
+```python
 
 ```

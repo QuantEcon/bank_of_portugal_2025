@@ -1,14 +1,16 @@
 ---
-jupytext:
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.17.2
-kernelspec:
-  display_name: Python 3 (ipykernel)
-  language: python
-  name: python3
+jupyter:
+  jupytext:
+    default_lexer: ipython3
+    text_representation:
+      extension: .md
+      format_name: markdown
+      format_version: '1.3'
+      jupytext_version: 1.17.2
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
 ---
 
 # Programming Exercise: Lorenz Curves and Gini Coefficients
@@ -25,13 +27,13 @@ that already exists in `quantecon`.
 
 Uncomment the following if necessary
 
-```{code-cell} ipython3
+```python
 #!pip install quantecon 
 ```
 
 We use the following imports.
 
-```{code-cell} ipython3
+```python
 import numba
 import numpy as np
 import matplotlib.pyplot as plt
@@ -43,7 +45,8 @@ import quantecon as qe
 
 ### Definition
 
-Let $w_1, \ldots, w_n$ be a sample of observations of wealth (or income, or consumption, or firm sizes, etc.) in a population.
+Let $w_1, \ldots, w_n$ be a sample of observations of wealth (or income, or
+consumption, or firm sizes, etc.) in a population.
 
 Suppose the sample has been sorted from smallest to largest.
 
@@ -51,14 +54,14 @@ The Lorenz curve takes this sample and produces a curve $L$.
 
 To create it we first generate data points $(x_i, y_i)_{i=0}^n$  according to
 
-\begin{equation*}
+$$
     x_0 = y_0 = 0
     \qquad \text{and, for $i \geq 1$,} \quad
     x_i = \frac{i}{n},
     \qquad
     y_i =
        \frac{\sum_{j \leq i} w_j}{\sum_{j \leq n} w_j}  
-\end{equation*}
+$$
 
 Now the Lorenz curve $L$ is formed from these data points using interpolation.
 
@@ -68,36 +71,32 @@ people have $(100 \times y)$\% of all wealth.
 * if $x=0.5$ and $y=0.1$, then the bottom 50% of the population
   owns 10% of the wealth.
 
-+++
-
 ### Using QuantEcon's routine
 
 Let's look at an example.
 
 First we generate $n=2000$ draws from a lognormal distribution and treat these draws as our population.
 
-```{code-cell} ipython3
+```python
 n = 2000
 sample = np.exp(np.random.randn(n))       # Lognormal sample
 ```
 
 We then generate the Lorenz curve using a routine from `quantecon`.
 
-```{code-cell} ipython3
+```python
 x, y = qe.lorenz_curve(sample)            # QuantEcon routine (no need to sort)
 ```
 
 Now `x` and `y` contain the sample points $x_i$, $y_i$.
 
-Now let's plot.
-
-In what follows, Matplotlib will supply the interpolation mentioned above.
+Let's plot, allowing Matplotlib to provide the interpolation.
 
 The straight line ($x=L(x)$ for all $x$) corresponds to perfect equality.  
 
 The lognormal draws produce a less equal distribution.
 
-```{code-cell} ipython3
+```python
 fig, ax = plt.subplots()
 ax.plot(x, y, label=f'lognormal sample', lw=2)
 ax.plot(x, x, label='equality', lw=2)
@@ -114,7 +113,7 @@ For example, if we imagine these draws as being observations of wealth across a
 sample of households, then the dashed lines show that the bottom 80\% of
 households own just over 40\% of total wealth.
 
-+++
+
 
 **Exercise**
 
@@ -126,31 +125,31 @@ your own version of `qe.lorenz_curve`.
 
 Try to replicate the figure above, using the same lognormal data set.
 
-```{code-cell} ipython3
+```python
 # Put your code here
 ```
 
-```{code-cell} ipython3
+```python
 for i in range(20):
     print("Solution below.")
 ```
 
-**Solution**
 
-```{code-cell} ipython3
+```python
+
 @numba.jit
 def lorenz_curve(w):
     n = len(w)
     w = np.sort(w)
-    s = np.zeros(n + 1)
-    s[1:] = np.cumsum(w)  # s[i] = sum_{j <= i} w_j
     x = np.zeros(n + 1)
     y = np.zeros(n + 1)
+    running_sum = w[0]
+    total_sum = np.sum(w)
     for i in range(1, n + 1):
         x[i] = i / n
-        y[i] = s[i] / s[n]
+        y[i] = running_sum / total_sum
+        running_sum += w[i]
     return x, y
-
 
 x, y = lorenz_curve(sample)    # Our routine
 
@@ -166,21 +165,20 @@ ax.hlines(y[j], [0], x[j], alpha=0.5, colors='k', ls='--')
 plt.show()
 ```
 
+
 ## The Gini coefficient
 
 ### Definition
 
-
 Continuing to assume that $w_1, \ldots, w_n$ has been sorted from smallest to largest,
 the Gini coefficient of the sample is defined by
 
-\begin{equation}
-    \label{eq:gini}
+$$
     G :=
     \frac
         {\sum_{i=1}^n \sum_{j = 1}^n |w_j - w_i|}
         {2n\sum_{i=1}^n w_i}.
-\end{equation}
+$$
 
 
 
@@ -198,7 +196,7 @@ between $0.2$ and $4$.
 
 In each case we set $\mu = - \sigma^2 / 2$, so that the mean of the distribution does not change with $\sigma$.
 
-```{code-cell} ipython3
+```python
 k = 5
 σ_vals = np.linspace(0.2, 4, k)
 n = 2_000
@@ -211,7 +209,7 @@ for σ in σ_vals:
     ginis.append(qe.gini_coefficient(y))
 ```
 
-```{code-cell} ipython3
+```python
 fig, ax = plt.subplots()
 ax.plot(σ_vals, ginis, marker='o')
 ax.set_xlabel('$\sigma$', fontsize=12)
@@ -221,7 +219,6 @@ plt.show()
 
 The plots show that inequality rises with $\sigma$ (as measured by the Gini coefficient).
 
-+++
 
 **Exercise**
 
@@ -229,27 +226,46 @@ Using the definition above and NumPy, try to write your own version of
 `qe.gini_coefficient`.  
 
 * Try to replicate the figure above.
-* If possible, accelerate your code with Numba
-* If possible, parallelize one of the loops
+* Accelerate your code with Numba.
+* If possible, parallelize one of the loops.
 
-```{code-cell} ipython3
+
+```python
 # Put your code here
 ```
 
-```{code-cell} ipython3
+```python
 for i in range(12):
     print("Solution below.")
 ```
 
 **Solution**
 
-+++
+Here's one solution, without parallelization
 
-Here's one solution.
+```python
+@numba.jit
+def gini_coefficient(w):
+    n = len(w)
+    s = 0.0
+    for i in range(n):
+        for j in range(n):
+            s += abs(w[i] - w[j])
+    return s / (2 * n * np.sum(w))
+```
 
-Notice how easy it is to parallelize the loop --- even though `s` is common across the outer loops, which violates independence, this loop is still efficiently parallelized.
+```python
+sample = np.exp(np.random.randn(100_000))
+gini_coefficient(sample)
+```
 
-```{code-cell} ipython3
+```python
+%time gini_coefficient(sample)
+```
+
+Here's another, with parallelization
+
+```python
 @numba.jit(parallel=True)
 def gini_coefficient(w):
     n = len(w)
@@ -260,7 +276,15 @@ def gini_coefficient(w):
     return s / (2 * n * np.sum(w))
 ```
 
-```{code-cell} ipython3
+```python
+gini_coefficient(sample)
+```
+
+```python
+%time gini_coefficient(sample)
+```
+
+```python
 ginis = []
 
 for σ in σ_vals:
@@ -276,10 +300,6 @@ ax.set_ylabel('Gini coefficient', fontsize=12)
 plt.show()
 ```
 
-```{code-cell} ipython3
-
-```
-
-```{code-cell} ipython3
+```python
 
 ```
