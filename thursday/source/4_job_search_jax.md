@@ -4,7 +4,7 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.17.2
+    jupytext_version: 1.17.3
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -113,9 +113,12 @@ def create_js_model(
         β: float = 0.99,    # discount factor
         c: float = 1.0,     # unemployment compensation
     ) -> Model:
-    "Creates an instance of the job search model with Markov wages."
+    """
+    Creates an instance of the job search model with Markov wages.
+    """
     mc = qe.tauchen(n, ρ, ν)
     w_vals, P = jnp.exp(mc.state_values), jnp.array(mc.P)
+    
     return Model(n, w_vals, P, β, c)
 ```
 
@@ -478,7 +481,7 @@ def generic_vfi(
     return new_v, get_greedy_function(new_v)
 ```
 
-## Fully JIT-compiled VFI with lax.while_loop
+## JIT-compiled VFI with lax.while_loop
 
 This version uses JAX's `lax.while_loop` for maximum performance with early termination.
 

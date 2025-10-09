@@ -17,7 +17,6 @@ kernelspec:
 
 **Author:** [John Stachurski](https://johnstachurski.net)
 
-
 +++
 
 # GPU
@@ -196,6 +195,12 @@ Inspecting the identifier of `a` shows that it has been reassigned
 ```{code-cell} ipython3
 id(a)
 ```
+
+Claude Sonnet: "In essence, JAX trades the convenience of mutations for the power of automatic differentiation, compilation, and parallelization - which is exactly what you want for high-performance numerical computing and deep learning."
+
+More on this below.
+
++++
 
 ## Random Numbers
 
@@ -386,17 +391,22 @@ From JAX’s documentation:
 
 In other words, JAX assumes a functional programming style.
 
-The major implication is that JAX functions should be pure.
+The major implication is that JAX functions should be **pure**:
 
-A pure function will always return the same result if invoked with the same inputs.
+1. Deterministic / Referential Transparency
 
-In particular, a pure function has
+- Given the same inputs, a pure function always returns the same output
+- No dependence on hidden state, global variables, or external conditions
 
-- no dependence on global variables and  
-- no side effects  
+2. No Side Effects
 
+- Doesn't modify anything outside its scope
+- No mutations of input arguments
+- No modifying global variables
 
-JAX will not usually throw errors when compiling impure functions but execution becomes unpredictable.
+Key idea: Functions are isolated logical entities, the actions and affects of which can be understood purely from inspection of the function itself.
+
+**Be careful:**  JAX will not usually throw errors when compiling impure functions but execution becomes unpredictable.
 
 Here’s an illustration of this fact, using global variables:
 
@@ -649,8 +659,6 @@ jnp.allclose(z_vmap, z_mesh)
 ## Exercises
 
 +++
-
-
 
 In the Exercise section of [a lecture on Numba and parallelization](https://python-programming.quantecon.org/parallelization.html), we use Monte Carlo to price a European call option.
 

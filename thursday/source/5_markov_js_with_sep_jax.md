@@ -1,14 +1,16 @@
 ---
-jupytext:
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.17.2
-kernelspec:
-  display_name: Python 3 (ipykernel)
-  language: python
-  name: python3
+jupyter:
+  jupytext:
+    default_lexer: ipython3
+    text_representation:
+      extension: .md
+      format_name: markdown
+      format_version: '1.3'
+      jupytext_version: 1.17.3
+  kernelspec:
+    display_name: Python 3 (ipykernel)
+    language: python
+    name: python3
 ---
 
 # Job Search with Separation
@@ -36,46 +38,66 @@ When unemployed and receiving wage offer w, the agent chooses between:
 
 ## Value Functions
 
-- v_u*(w): Value of being unemployed when current wage offer is w
-- v_e*(w): Value of being employed at wage w
+- v_u(w): Value of being unemployed when current wage offer is w
+- v_e(w): Value of being employed at wage w
 
 ## Bellman Equations
 
 The unemployed worker's value function satisfies:
 
-$$v_u^*(w) = \max\{v_e^*(w), c + \beta \sum_{w'} v_u^*(w') P(w,w')\}$$
+$$
+    v_u(w) = \max\{v_e(w), c + \beta \sum_{w'} v_u(w') P(w,w')\}
+$$
 
 The employed worker's value function satisfies:
 
-$$v_e^*(w) = w + \beta[\alpha \sum_{w'} v_u^*(w') P(w,w') + (1-\alpha) v_e^*(w)]$$
+$$
+    v_e(w) = 
+    w + \beta
+    \left[
+        \alpha \sum_{w'} v_u(w') P(w,w') + (1-\alpha) v_e(w)
+    \right]
+$$
 
 ## Computational Approach
 
 1. Solve the employed value function analytically:
-   $$v_e^*(w) = \frac{1}{1-\beta(1-\alpha)} \cdot (w + \alpha\beta(Pv_u^*)(w))$$
+
+$$
+    v_e(w) = 
+    \frac{1}{1-\beta(1-\alpha)} \cdot (w + \alpha\beta(Pv_u)(w))
+$$
 
 2. Substitute into unemployed Bellman equation to get:
-   $$v_u^*(w) = \max\left\{\frac{1}{1-\beta(1-\alpha)} \cdot (w + \alpha\beta(Pv_u^*)(w)), c + \beta(Pv_u^*)(w)\right\}$$
 
-3. Use value function iteration to solve for v_u*
-4. Compute optimal policy: accept if v_e*(w) ≥ c + β(Pv_u*)(w)
 
-The optimal policy is a reservation wage strategy: accept all wages above
-some threshold w*.
+$$
+    v_u(w) = 
+    \max
+    \left\{
+        \frac{1}{1-\beta(1-\alpha)} \cdot (w + \alpha\beta(Pv_u)(w)),
+        c + \beta(Pv_u)(w)
+    \right\}
+$$
 
-+++
+3. Use value function iteration to solve for $v_u$
+4. Compute optimal policy: accept if $v_e(w) ≥ c + β(Pv_u)(w)$
+
+The optimal policy is a reservation wage strategy: accept all wages above some
+threshold w*.
+
 
 ## Code
 
 In addition to what's in Anaconda, this lecture will need the QE library:
 
-```{code-cell} ipython3
+```python
 #!pip install quantecon  # Uncomment if necessary
 ```
 
 We use the following imports:
 
-```{code-cell} ipython3
+```python
 from quantecon.markov import tauchen
 import jax.numpy as jnp
 import jax
@@ -87,7 +109,7 @@ from functools import partial
 
 First, we implement the successive approximation algorithm:
 
-```{code-cell} ipython3
+```python
 @partial(jit, static_argnums=(0,))
 def successive_approx(
         T,                         # Operator (callable) - marked as static
@@ -116,7 +138,7 @@ def successive_approx(
 
 Let's set up a `Model` class to store information needed to solve the model:
 
-```{code-cell} ipython3
+```python
 class Model(NamedTuple):
     n: int
     w_vals: jnp.ndarray
@@ -128,7 +150,7 @@ class Model(NamedTuple):
 
 The function below holds default values and creates a `Model` instance:
 
-```{code-cell} ipython3
+```python
 def create_js_with_sep_model(
         n: int = 200,          # wage grid size
         ρ: float = 0.9,        # wage persistence
@@ -145,7 +167,7 @@ def create_js_with_sep_model(
 
 Here's the Bellman operator for the unemployed worker's value function:
 
-```{code-cell} ipython3
+```python
 @jit
 def T(v: jnp.ndarray, model: Model) -> jnp.ndarray:
     """The Bellman operator for the value of being unemployed."""
@@ -159,7 +181,7 @@ def T(v: jnp.ndarray, model: Model) -> jnp.ndarray:
 The next function computes the optimal policy under the assumption that v is
 the value function:
 
-```{code-cell} ipython3
+```python
 @jit
 def get_greedy(v: jnp.ndarray, model: Model) -> jnp.ndarray:
     """Get a v-greedy policy."""
@@ -173,7 +195,7 @@ def get_greedy(v: jnp.ndarray, model: Model) -> jnp.ndarray:
 
 Here's a routine for value function iteration:
 
-```{code-cell} ipython3
+```python
 def vfi(model: Model):
     """Solve by VFI."""
     v_init = jnp.zeros(model.w_vals.shape)
@@ -208,7 +230,7 @@ def get_reservation_wage(σ: jnp.ndarray, model: Model) -> float:
 
 Let's solve the model and plot the results:
 
-```{code-cell} ipython3
+```python
 model = create_js_with_sep_model()
 n, w_vals, P, β, c, α = model
 v_star, σ_star = vfi(model)
@@ -234,7 +256,7 @@ plt.show()
 
 Let's examine how reservation wages change with the separation rate α:
 
-```{code-cell} ipython3
+```python
 α_vals: jnp.ndarray = jnp.linspace(0.0, 1.0, 10)
 
 w_star_vec = jnp.empty_like(α_vals)
@@ -257,7 +279,7 @@ plt.show()
 
 Now let's simulate the employment dynamics of a single agent under the optimal policy:
 
-```{code-cell} ipython3
+```python
 @jit
 def weighted_choice(key, probs):
     """JAX-compatible weighted random choice."""
@@ -292,7 +314,7 @@ def update_agent(key, is_employed, wage_idx, model, σ_star):
     return final_employment, final_wage
 ```
 
-```{code-cell} ipython3
+```python
 def simulate_employment_path(
         model: Model,     # Model details
         T: int = 2_000,   # Simulation length
@@ -307,10 +329,9 @@ def simulate_employment_path(
     n, w_vals, P, β, c, α = model
     v_star, σ_star = vfi(model)
 
-    # Start unemployed with uniform wage draw
-    key, subkey = jax.random.split(key)
+    # Initial conditions
     is_employed = 0
-    wage_idx = jax.random.randint(subkey, (), 0, n)
+    wage_idx = 0
 
     wage_path_list = []
     employment_status_list = []
@@ -329,7 +350,7 @@ def simulate_employment_path(
 
 Let's create a comprehensive plot of the employment simulation:
 
-```{code-cell} ipython3
+```python
 model = create_js_with_sep_model()
 
 # Calculate reservation wage for plotting
@@ -395,40 +416,53 @@ The model successfully captures the essential features of labor market dynamics 
 
 Now let's simulate many agents simultaneously to examine the cross-sectional unemployment rate:
 
-```{code-cell} ipython3
+```python
 # Create vectorized version of update_agent
-update_agents_vmap = jax.vmap(update_agent, in_axes=(0, 0, 0, None, None))
+update_agents_vmap = jax.vmap(
+    update_agent, in_axes=(0, 0, 0, None, None)
+)
 ```
 
-```{code-cell} ipython3
+```python
 @partial(jit, static_argnums=(3, 4))
-def _simulate_cross_section_compiled(key, model, σ_star, n_agents, T):
+def _simulate_cross_section_compiled(
+        key: jnp.ndarray,
+        model: Model, 
+        σ_star: jnp.ndarray, 
+        n_agents: int, 
+        T: int
+    ):
     """JIT-compiled core simulation loop using lax.scan."""
     n, w_vals, P, β, c, α = model
     
     # Initialize arrays
-    key, subkey = jax.random.split(key)
-    wage_indices = jax.random.randint(subkey, (n_agents,), 0, n)
+    wage_indices = jnp.zeros(n_agents, dtype=jnp.int32)
     is_employed = jnp.zeros(n_agents, dtype=jnp.int32)
     
-    def scan_fn(carry, t):
-        key, is_employed, wage_indices = carry
+    def scan_fn(loop_state, t):
+        key, is_employed, wage_indices = loop_state
         
         # Record employment status for this time step 
         employment_status = is_employed
-        
+
+        # Shift loop state forwards
         key, *agent_keys = jax.random.split(key, n_agents + 1)
         agent_keys = jnp.array(agent_keys)
         
         is_employed, wage_indices = update_agents_vmap(
             agent_keys, is_employed, wage_indices, model, σ_star
         )
-        
-        return (key, is_employed, wage_indices), employment_status
+
+        # Pack results and return
+        new_loop_state = key, is_employed, wage_indices
+        return new_loop_state, employment_status
     
     # Run simulation using scan
-    initial_carry = (key, is_employed, wage_indices)
-    _, employment_matrix = lax.scan(scan_fn, initial_carry, jnp.arange(T))
+    initial_loop_state = (key, is_employed, wage_indices)
+    
+    final_loop_state, employment_matrix = lax.scan(
+        scan_fn, initial_loop_state, jnp.arange(T)
+    )
     
     # Transpose to get (n_agents, T) shape
     employment_matrix = employment_matrix.T
@@ -461,7 +495,9 @@ def simulate_cross_section(
     v_star, σ_star = vfi(model)
     
     # Run JIT-compiled simulation
-    employment_matrix = _simulate_cross_section_compiled(key, model, σ_star, n_agents, T)
+    employment_matrix = _simulate_cross_section_compiled(
+        key, model, σ_star, n_agents, T
+    )
     
     # Calculate unemployment rate at each period
     unemployment_rates = 1 - jnp.mean(employment_matrix, axis=0)
@@ -469,7 +505,7 @@ def simulate_cross_section(
     return unemployment_rates, employment_matrix
 ```
 
-```{code-cell} ipython3
+```python
 def plot_cross_sectional_unemployment(model: Model):
     """
     Generate cross-sectional unemployment rate plot for a given model.
@@ -509,7 +545,7 @@ def plot_cross_sectional_unemployment(model: Model):
     plt.show()
 ```
 
-```{code-cell} ipython3
+```python
 model = create_js_with_sep_model()
 plot_cross_sectional_unemployment(model)
 ```
@@ -518,7 +554,7 @@ plot_cross_sectional_unemployment(model)
 
 Let's examine how the cross-sectional unemployment rate changes with lower unemployment compensation:
 
-```{code-cell} ipython3
+```python
 model_low_c = create_js_with_sep_model(c=0.5)
 plot_cross_sectional_unemployment(model_low_c)
 ```
@@ -528,14 +564,14 @@ plot_cross_sectional_unemployment(model_low_c)
 Create a plot that shows how the steady state cross-sectional unemployment rate
 changes with unemployment compensation.
 
-```{code-cell} ipython3
+```python
 for _ in range(20):
     print('Solution below!')
 ```
 
 ## Solution
 
-```{code-cell} ipython3
+```python
 c_values = 1.0, 0.8, 0.6, 0.4, 0.2
 rates = []
 for c in c_values:
@@ -552,6 +588,6 @@ ax.legend(frameon=False)
 plt.show()
 ```
 
-```{code-cell} ipython3
+```python
 
 ```
